@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    container_name: jobtracker-postgres
+    ports:
+     - "5432:5432"
+    environment:
+      POSTGRES_DB: jobtracker
+      POSTGRES_USER: jobtracker
+      POSTGRES_PASSWORD: jobtracker
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
