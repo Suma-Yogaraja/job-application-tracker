@@ -1,9 +1,8 @@
 package com.jobtracker.job_application_tracker.service;
 
 
-import com.jobtracker.job_application_tracker.dto.ApplicationResponse;
-import com.jobtracker.job_application_tracker.dto.CreateApplicationRequest;
-import com.jobtracker.job_application_tracker.dto.UpdateStatusRequest;
+import com.jobtracker.job_application_tracker.dto.*;
+import com.jobtracker.job_application_tracker.messaging.StatusChangedProducer;
 import com.jobtracker.job_application_tracker.model.Application;
 import com.jobtracker.job_application_tracker.model.ApplicationStatus;
 import com.jobtracker.job_application_tracker.model.User;
@@ -15,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +24,7 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final StatusChangedProducer statusChangedProducer;
 
     public ApplicationResponse create(CreateApplicationRequest req, String email) {
         User user = userRepository.findByEmail(email)
@@ -44,8 +45,8 @@ public class ApplicationService {
     }
 
 
-    public List<ApplicationResponse> getMyApplications(String emaill){
-        User user=userRepository.findByEmail(emaill)
+    public List<ApplicationResponse> getMyApplications(String email){
+        User user=userRepository.findByEmail(email)
                 .orElseThrow(()-> new RuntimeException("user not found"));
         List<Application> apps= applicationRepository.findAllByUserId(user.getId());
         List<ApplicationResponse> res=new ArrayList<>();
@@ -66,9 +67,18 @@ public class ApplicationService {
             if (!app.getUser().getId().equals(user.getId())) {
                     throw new RuntimeException("forbidden");
           }
+            ApplicationStatus old=app.getStatus();
             app.setStatus(status);
-        Application saved=applicationRepository.save(app);
-            return toResponse(saved);
+            Application saved=applicationRepository.save(app);
+
+        StatusChangedEvent event=new StatusChangedEvent();
+        event.setApplicationId(saved.getId());
+        event.setOldStatus(old);
+        event.setNewStatus(saved.getStatus());
+        event.setChangedAt(LocalDateTime.now());
+
+        statusChangedProducer.publish(event);
+        return toResponse(saved);
     }
 
 

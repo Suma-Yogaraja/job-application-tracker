@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/applications")
-
 public class ApplicationController {
 
 
@@ -44,12 +43,12 @@ public class ApplicationController {
         return ResponseEntity.ok(applicationService.getMyApplications(email));
     }
 
-    @PostMapping("/{applicationID}/status")
+    @PatchMapping("/{applicationID}/status")
     public ResponseEntity<ApplicationResponse> updateStatus(@PathVariable Long applicationID
-                                                                                                                , @Valid @RequestBody ApplicationStatus req){
+                                                                                                                , @Valid @RequestBody UpdateStatusRequest req){
 
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(applicationService.updateStatus(applicationID,req,email));
+        return ResponseEntity.ok(applicationService.updateStatus(applicationID,req.getStatus(),email));
     }
 }

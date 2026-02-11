@@ -3,6 +3,8 @@ package com.jobtracker.job_application_tracker.service;
 
 import com.jobtracker.job_application_tracker.dto.CreateInterviewRequest;
 import com.jobtracker.job_application_tracker.dto.InterviewResponse;
+import com.jobtracker.job_application_tracker.dto.InterviewScheduledEvent;
+import com.jobtracker.job_application_tracker.messaging.InterviewScheduledProducer;
 import com.jobtracker.job_application_tracker.model.Application;
 import com.jobtracker.job_application_tracker.model.Interview;
 import com.jobtracker.job_application_tracker.model.User;
@@ -13,6 +15,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,8 +27,10 @@ public class InterviewService {
     private final UserRepository userRepository;
     private final InterviewRepository interviewRepository;
     private final ApplicationRepository applicationRepository;
+    private final InterviewScheduledProducer interviewScheduledProducer;
 
     public InterviewResponse createInterview(Long applicationID, CreateInterviewRequest req,String email){
+
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(()->new RuntimeException("user not found"));
@@ -41,6 +46,16 @@ public class InterviewService {
         interview.setScheduledAt(req.getScheduledAt());
         interview.setNotes(req.getNotes());
         Interview saved=interviewRepository.save(interview);
+
+        InterviewScheduledEvent event=new InterviewScheduledEvent();
+        event.setInterviewId((saved.getId()));
+        event.setCreatedAt(LocalDateTime.now());
+        event.setApplicationId(saved.getApplication().getId());
+        event.setRoundType(saved.getRoundType());
+        event.setScheduledAt(saved.getScheduledAt());
+
+        interviewScheduledProducer.publish(event);
+
         return toResponse(saved);
     }
 
