@@ -2,6 +2,7 @@ package com.jobtracker.job_application_tracker.service;
 
 
 import com.jobtracker.job_application_tracker.dto.*;
+import com.jobtracker.job_application_tracker.messaging.ApplicationCreatedProducer;
 import com.jobtracker.job_application_tracker.messaging.StatusChangedProducer;
 import com.jobtracker.job_application_tracker.model.Application;
 import com.jobtracker.job_application_tracker.model.ApplicationStatus;
@@ -25,6 +26,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
     private final StatusChangedProducer statusChangedProducer;
+    private final ApplicationCreatedProducer applicationCreatedProducer;
 
     public ApplicationResponse create(CreateApplicationRequest req, String email) {
         User user = userRepository.findByEmail(email)
@@ -40,6 +42,13 @@ public class ApplicationService {
         app.setStatus(req.getStatus() == null ? ApplicationStatus.APPLIED : req.getStatus());
         app.setUser(user);
         Application savedApp= applicationRepository.save(app);
+        ApplicationCreatedEvent event=new ApplicationCreatedEvent();
+        event.setCreatedAt(LocalDateTime.now());
+        event.setApplicationId(savedApp.getId());
+        event.setRole(savedApp.getRole());
+        event.setCompany(savedApp.getCompany());
+
+        applicationCreatedProducer.publish(event);
         //map to dto
         return toResponse(app);
     }

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.jobtracker</groupId>
-	<artifactId>job-application-tracker</artifactId>
+	<artifactId>job_application_tracker</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>job-application-tracker</name>
 	<description>job-application-tracker</description>
