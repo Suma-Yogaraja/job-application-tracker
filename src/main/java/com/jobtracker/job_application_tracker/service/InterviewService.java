@@ -4,6 +4,8 @@ package com.jobtracker.job_application_tracker.service;
 import com.jobtracker.job_application_tracker.dto.CreateInterviewRequest;
 import com.jobtracker.job_application_tracker.dto.InterviewResponse;
 import com.jobtracker.job_application_tracker.dto.InterviewScheduledEvent;
+import com.jobtracker.job_application_tracker.exception.ForbiddenException;
+import com.jobtracker.job_application_tracker.exception.NotFoundException;
 import com.jobtracker.job_application_tracker.messaging.InterviewScheduledProducer;
 import com.jobtracker.job_application_tracker.model.Application;
 import com.jobtracker.job_application_tracker.model.Interview;
@@ -33,12 +35,12 @@ public class InterviewService {
 
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("user not found"));
+                .orElseThrow(()->new NotFoundException("user not found"));
         Application app=applicationRepository.findById(applicationID)
-                .orElseThrow(()->new RuntimeException("application not found"));
+                .orElseThrow(()->new NotFoundException("application not found"));
 
         if(!app.getUser().getId().equals(user.getId()))
-                throw new RuntimeException("forbidden");
+                throw new ForbiddenException("forbidden");
 
         Interview interview=new Interview();
         interview.setApplication(app);
@@ -61,12 +63,12 @@ public class InterviewService {
 
     public List<InterviewResponse> listInterviews(Long applicationID,String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("user not found"));
+                .orElseThrow(()->new NotFoundException("user not found"));
         Application app=applicationRepository.findById(applicationID)
-                .orElseThrow(()->new RuntimeException("application not found"));
+                .orElseThrow(()->new NotFoundException("application not found"));
 
         if (!app.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("forbidden");
+            throw new ForbiddenException("forbidden");
         }
 
         List<Interview> interviews=interviewRepository.findAllByApplicationId(applicationID);

@@ -2,6 +2,8 @@ package com.jobtracker.job_application_tracker.service;
 
 
 import com.jobtracker.job_application_tracker.dto.*;
+import com.jobtracker.job_application_tracker.exception.ForbiddenException;
+import com.jobtracker.job_application_tracker.exception.NotFoundException;
 import com.jobtracker.job_application_tracker.messaging.ApplicationCreatedProducer;
 import com.jobtracker.job_application_tracker.messaging.StatusChangedProducer;
 import com.jobtracker.job_application_tracker.model.Application;
@@ -30,7 +32,7 @@ public class ApplicationService {
 
     public ApplicationResponse create(CreateApplicationRequest req, String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("user not found"));
+                .orElseThrow(()->new NotFoundException("user not found"));
 
         //build application
         Application app=new Application();
@@ -56,7 +58,7 @@ public class ApplicationService {
 
     public List<ApplicationResponse> getMyApplications(String email){
         User user=userRepository.findByEmail(email)
-                .orElseThrow(()-> new RuntimeException("user not found"));
+                .orElseThrow(()-> new NotFoundException("user not found"));
         List<Application> apps= applicationRepository.findAllByUserId(user.getId());
         List<ApplicationResponse> res=new ArrayList<>();
         for(Application app:apps){
@@ -70,11 +72,11 @@ public class ApplicationService {
         if(status==null)
                 throw new RuntimeException("status cannot be null");
             User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("user not found"));
+                .orElseThrow(()->new NotFoundException("user not found"));
             Application app=applicationRepository.findById(applicationID)
-                .orElseThrow(()->new RuntimeException("application not found"));
+                .orElseThrow(()->new NotFoundException("application Not found"));
             if (!app.getUser().getId().equals(user.getId())) {
-                    throw new RuntimeException("forbidden");
+                    throw new ForbiddenException("forbidden");
           }
             ApplicationStatus old=app.getStatus();
             app.setStatus(status);

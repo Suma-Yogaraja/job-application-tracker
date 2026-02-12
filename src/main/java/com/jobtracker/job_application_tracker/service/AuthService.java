@@ -3,6 +3,7 @@ package com.jobtracker.job_application_tracker.service;
 import com.jobtracker.job_application_tracker.dto.AuthResponse;
 import com.jobtracker.job_application_tracker.dto.LoginRequest;
 import com.jobtracker.job_application_tracker.dto.RegisterRequest;
+import com.jobtracker.job_application_tracker.exception.NotFoundException;
 import com.jobtracker.job_application_tracker.model.User;
 import com.jobtracker.job_application_tracker.repository.UserRepository;
 import com.jobtracker.job_application_tracker.security.JwtService;
@@ -45,7 +46,7 @@ public class AuthService {
     }
     public AuthResponse login(LoginRequest loginRequest){
         User user=userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(()-> new UsernameNotFoundException("user not found"));
+                .orElseThrow(()-> new NotFoundException("user not found"));
 
         if(!passwordEncoder.matches(loginRequest.getPassword(),user.getPasswordHash()))
             throw new RuntimeException("Invalid password");
