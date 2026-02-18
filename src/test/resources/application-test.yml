@@ -1,0 +1,21 @@
+jwt:
+  secret: "01234567890123456789012345678901"
+  expirationMinutes: 60
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jobtracker_test
+    username: jobtracker
+    password: jobtracker
+  jpa:
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled:true
+  logging:
+    level:
+      org.flywaydb: DEBUG
+
+kafka:
+  consumer:
+    auto-startup: false

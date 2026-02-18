@@ -1,17 +1,16 @@
 package com.jobtracker.job_application_tracker;
 
-import org.junit.jupiter.api.Disabled;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-
-@Disabled
 @SpringBootTest
-class JobApplicationTrackerApplicationTests {
+@ActiveProfiles("test")
+public class ContextLoadsTest {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void  contextLoads(){
 
+    }
 }

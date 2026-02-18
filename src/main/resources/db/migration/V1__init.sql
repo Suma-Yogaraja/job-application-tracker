@@ -31,3 +31,4 @@ CREATE TABLE interviews (
 );
 
 CREATE INDEX idx_interviews_application_id ON interviews(application_id);
+
