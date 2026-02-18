@@ -11,15 +11,22 @@ import com.jobtracker.job_application_tracker.model.ApplicationStatus;
 import com.jobtracker.job_application_tracker.model.User;
 import com.jobtracker.job_application_tracker.repository.ApplicationRepository;
 import com.jobtracker.job_application_tracker.repository.UserRepository;
+import com.jobtracker.job_application_tracker.repository.spec.ApplicationSpecifications;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +99,11 @@ public class ApplicationService {
         return toResponse(saved);
     }
 
-
+private  Long getUserIdByEmail(String email){
+        User user=userRepository.findByEmail(email)
+                .orElseThrow(()-> new NotFoundException("user not found") );
+        return user.getId();
+}
     private ApplicationResponse toResponse(Application app) {
         ApplicationResponse res = new ApplicationResponse();
         res.setId(app.getId());
@@ -103,6 +114,58 @@ public class ApplicationService {
         res.setLink(app.getLink());
         res.setAppliedDate(app.getAppliedDate());
         return res;
+    }
+
+    public Page<ApplicationResponse> getMyApplicationsPaged(String email, String status, String company, String role, int page, int size, String sort) {
+
+        Long userId=getUserIdByEmail(email);
+        Pageable pageable= PageRequest.of(
+                Math.max(page,0),
+                clamp(size,1,50),
+                parseSort(sort)
+        );
+        Specification<Application> spec = Specification
+                .where(ApplicationSpecifications.belongsToUserId(userId));
+
+        if (status != null && !status.isBlank()) {
+            ApplicationStatus st = ApplicationStatus.valueOf(status.trim().toUpperCase());
+            spec = spec.and(ApplicationSpecifications.hasStatus(st));
+        }
+        if (company != null && !company.isBlank()) {
+            spec = spec.and(ApplicationSpecifications.companyContains(company.trim()));
+        }
+        if (role != null && !role.isBlank()) {
+            spec = spec.and(ApplicationSpecifications.roleContains(role.trim()));
+        }
+
+        return applicationRepository.findAll(spec, pageable)
+                .map(this::toResponse); // your existing mapper
+
+    }
+
+    private int clamp(int v, int min, int max) {
+        return Math.max(min, Math.min(max, v));
+    }
+
+    private static final Set<String> ALLOWED_SORT_FIELDS =
+            Set.of("createdAt", "appliedDate", "company", "role", "status");
+
+    private Sort parseSort(String sortParam) {
+        String field = "createdAt";
+        Sort.Direction direction = Sort.Direction.DESC;
+
+        if (sortParam != null && !sortParam.isBlank()) {
+            String[] parts = sortParam.split(",");
+            if (parts.length >= 1 && !parts[0].isBlank()) {
+                String requested = parts[0].trim();
+                if (ALLOWED_SORT_FIELDS.contains(requested)) field = requested;
+            }
+            if (parts.length >= 2 && !parts[1].isBlank()) {
+                direction = "asc".equalsIgnoreCase(parts[1].trim()) ? Sort.Direction.ASC : Sort.Direction.DESC;
+            }
+        }
+
+        return Sort.by(direction, field);
     }
 
 }

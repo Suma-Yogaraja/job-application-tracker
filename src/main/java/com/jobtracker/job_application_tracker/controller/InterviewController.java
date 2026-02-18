@@ -6,8 +6,7 @@ import com.jobtracker.job_application_tracker.dto.CreateInterviewRequest;
 import com.jobtracker.job_application_tracker.dto.InterviewResponse;
 import com.jobtracker.job_application_tracker.service.InterviewService;
 import jakarta.validation.Valid;
-import org.jspecify.annotations.Nullable;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 

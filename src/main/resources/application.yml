@@ -18,3 +18,9 @@ spring:
 jwt:
   secret: "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_32+_CHARS"
   expirationMinutes: 120
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+  api-docs:
+    path: /v3/api-docs

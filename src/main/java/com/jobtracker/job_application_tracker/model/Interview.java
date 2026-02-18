@@ -1,10 +1,11 @@
 package com.jobtracker.job_application_tracker.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.AnyDiscriminatorImplicitValues;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 
