@@ -24,3 +24,7 @@ springdoc:
     path: /swagger
   api-docs:
     path: /v3/api-docs
+
+kafka:
+  topics:
+    interviewScheduled: interview-scheduled

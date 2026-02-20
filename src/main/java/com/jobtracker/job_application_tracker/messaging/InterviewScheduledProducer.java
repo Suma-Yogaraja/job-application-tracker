@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InterviewScheduledProducer {
 
-    public static final String TOPIC="application-status-events";
+    public static final String TOPIC="interview-scheduled";
     private final KafkaTemplate<String , InterviewScheduledEvent> kafkaTemplate;
 
     public InterviewScheduledProducer(KafkaTemplate<String, InterviewScheduledEvent> kafkaTemplate) {
