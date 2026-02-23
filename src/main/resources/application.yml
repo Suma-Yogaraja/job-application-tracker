@@ -16,7 +16,7 @@ spring:
     enabled: true
 
 jwt:
-  secret: "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_32+_CHARS"
+  secret: "9f8d7c6b5a4e3f2g1h0j9k8l7m6n5p4q"
   expirationMinutes: 120
 
 springdoc:
