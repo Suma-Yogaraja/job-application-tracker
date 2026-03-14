@@ -1,6 +1,6 @@
----
 
-# Job Application Tracker
+
+ Job Application Tracker
 
 **Live Demo:** https://job-application-tracker-t3wj.onrender.com/swagger-ui/index.html
 
