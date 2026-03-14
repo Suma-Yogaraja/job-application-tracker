@@ -33,5 +33,3 @@ build/
 .vscode/
 
 
-### prod prfile ignore###
-application-prod.yml
