@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobtracker.job_application_tracker.dto.InterviewScheduledEvent;
 import com.jobtracker.job_application_tracker.model.ActivityLog;
 import com.jobtracker.job_application_tracker.repository.ActivityLogRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+@ConditionalOnProperty(name = "app.kafka.enabled", havingValue = "true")
 @Component
 public class InterviewScheduledConsumer {
     private final ActivityLogRepository activityLogRepository;

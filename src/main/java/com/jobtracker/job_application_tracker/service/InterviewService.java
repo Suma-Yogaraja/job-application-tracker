@@ -15,6 +15,7 @@ import com.jobtracker.job_application_tracker.repository.InterviewRepository;
 import com.jobtracker.job_application_tracker.repository.UserRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,13 +24,21 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+
 public class InterviewService {
 
-    private final UserRepository userRepository;
-    private final InterviewRepository interviewRepository;
-    private final ApplicationRepository applicationRepository;
-    private final InterviewScheduledProducer interviewScheduledProducer;
+
+    @Autowired
+    private  UserRepository userRepository;
+
+    @Autowired
+    private  InterviewRepository interviewRepository;
+
+    @Autowired
+    private  ApplicationRepository applicationRepository;
+
+    @Autowired(required = false)
+    private  InterviewScheduledProducer interviewScheduledProducer;
 
     public InterviewResponse createInterview(Long applicationID, CreateInterviewRequest req,String email){
 
@@ -56,7 +65,8 @@ public class InterviewService {
         event.setRoundType(saved.getRoundType());
         event.setScheduledAt(saved.getScheduledAt());
 
-        interviewScheduledProducer.publish(event);
+        if (interviewScheduledProducer != null)
+            interviewScheduledProducer.publish(event);
 
         return toResponse(saved);
     }

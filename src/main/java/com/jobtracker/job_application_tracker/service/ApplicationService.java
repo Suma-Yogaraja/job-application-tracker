@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,13 +30,19 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@RequiredArgsConstructor
 public class ApplicationService {
 
-    private final ApplicationRepository applicationRepository;
-    private final UserRepository userRepository;
-    private final StatusChangedProducer statusChangedProducer;
-    private final ApplicationCreatedProducer applicationCreatedProducer;
+    @Autowired
+    private  ApplicationRepository applicationRepository;
+
+    @Autowired
+    private  UserRepository userRepository;
+
+    @Autowired(required = false)
+    private  StatusChangedProducer statusChangedProducer;
+
+    @Autowired(required = false)
+    private  ApplicationCreatedProducer applicationCreatedProducer;
 
     public ApplicationResponse create(CreateApplicationRequest req, String email) {
         User user = userRepository.findByEmail(email)
@@ -57,7 +64,8 @@ public class ApplicationService {
         event.setRole(savedApp.getRole());
         event.setCompany(savedApp.getCompany());
 
-        applicationCreatedProducer.publish(event);
+        if (applicationCreatedProducer != null)
+            applicationCreatedProducer.publish(event);
         //map to dto
         return toResponse(app);
     }
@@ -95,7 +103,8 @@ public class ApplicationService {
         event.setNewStatus(saved.getStatus());
         event.setChangedAt(LocalDateTime.now());
 
-        statusChangedProducer.publish(event);
+        if (statusChangedProducer != null)
+            statusChangedProducer.publish(event);
         return toResponse(saved);
     }
 
