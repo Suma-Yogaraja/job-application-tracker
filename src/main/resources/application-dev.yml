@@ -1,0 +1,25 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jobtracker
+    username: jobtracker
+    password: jobtracker
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+  kafka:
+    bootstrap-servers: localhost:9092
+
+jwt:
+  secret: "9f8d7c6b5a4e3f2g1h0j9k8l7m6n5p4q"
+
+app:
+  kafka:
+    enabled: true
